@@ -258,7 +258,7 @@ def weather_page_second(request):
     year = [i for i in rain_data.index]
     rain_count = [i for i in rain_data.values]
     line = Line("每年下雨的天数", width=800, title_pos='center', title_top='bottom')
-    line.add('', year, rain_count)
+    line.add('', year, rain_count, yaxis_name='天数', yaxis_name_pos='end')
     context = dict(
         echart1=weather_pie.render_embed(),
         echart2=line.render_embed(),
@@ -275,11 +275,20 @@ def weather_page_third(request):
     direction_data = direction_data[direction_data.values > 2]
     direction = [i for i in direction_data.index]
     direction_count = [i for i in direction_data.values]
-    direction_pie = Pie('风向所占比例', width='1000px', height='600px', title_pos='center', title_top='bottom')
+    direction_pie = Pie('各种风向所占比例', width='1000px', height='600px', title_pos='center', title_top='bottom')
     direction_pie.add('数量', direction, direction_count, label_text_color=None, is_label_show=True,
                       legend_orient="vertical", legend_pos="left")
+    force_data = weather.groupby('power').direction.count().sort_values(ascending=False)
+    force_data.loc['其他'] = force_data[force_data.values <= 2].count()
+    force_data = force_data[force_data.values > 2]
+    force = [i for i in force_data.index]
+    force_count = [i for i in force_data.values]
+    force_pie = Pie('各种风力所占比例', width='1000px', height='750px', title_pos='center', title_top='bottom')
+    force_pie.add('数量', force, force_count, label_text_color=None, is_label_show=True,
+                  legend_orient="vertical", legend_pos="left")
     context = dict(
         echart1=direction_pie.render_embed(),
+        echart2=force_pie.render_embed(),
         host=REMOTE_HOST,
         script_list=direction_pie.get_js_dependencies(),
     )
