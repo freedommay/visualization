@@ -1,0 +1,26 @@
+{% extends 'mysite/base.html' %}
+{% block head %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/side.css' %}">
+    {% for jsfile_name in script_list %}
+        <script src="{{ host }}/{{ jsfile_name }}.js"></script>
+    {% endfor %}
+{% endblock head %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-2">
+            <div id="sidebar-wrapper">
+                <ul class="sidebar-nav">
+                    <li><a href="{% url 'spot1' %}">概览</a></li>
+                    <li><a href="#">热度</a></li>
+                    <li><a href="#">门票</a></li>
+                    <li><a href="#">游玩时间</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-10">
+            {% block chart %}
+            {% endblock chart %}
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,104 @@
+{% extends 'mysite/weather_base.html' %}
+{% block chart %}
+    {{ echart|safe }}<br>
+    <div class="row">
+        <div class="col-md-5">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">日期</th>
+                    <th scope="col">天气</th>
+                    <th scope="col">最高温度</th>
+                    <th scope="col">最低温度</th>
+                    <th scope="col">风力</th>
+                    <th scope="col">风速</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for max in max_max %}
+                    <tr>
+                        <th scope="row">{{ max.date }}</th>
+                        <td>{{ max.weather }}</td>
+                        <td class="table-warning">{{ max.max }}</td>
+                        <td>{{ max.min }}</td>
+                        <td>{{ max.power }}</td>
+                        <td>{{ max.direction }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <h5 class="text-center" style="font-family: 微软雅黑">历史温度最高</h5>
+        </div>
+        <div class="col-md-6">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">日期</th>
+                    <th scope="col">天气</th>
+                    <th scope="col">最高温度</th>
+                    <th scope="col">最低温度</th>
+                    <th scope="col">风力</th>
+                    <th scope="col">风速</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for min in min_min %}
+                    <tr>
+                        <th scope="row">{{ min.date }}</th>
+                        <td>{{ min.weather }}</td>
+                        <td>{{ min.max }}</td>
+                        <td class="table-primary">{{ min.min }}</td>
+                        <td>{{ min.power }}</td>
+                        <td>{{ min.direction }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <h5 class="text-center" style="font-family: 微软雅黑">历史温度最低</h5>
+        </div>
+    </div><br><br>
+    <div class="row">
+        <div class="col-md-10">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">最高温度(>=x)的天数(℃)</th>
+                    {% for t in above_t %}
+                        <th scope="col">{{ t }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row" class="text-center">天数</th>
+                    {% for count in above_count %}
+                        <td>{{ count }}</td>
+                    {% endfor %}
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div><br><br>
+    <div class="row">
+        <div class="col-md-10">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">最低温度(<=x)的天数(℃)</th>
+                    {% for t in below_t %}
+                        <th scope="col">{{ t }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row" class="text-center">天数</th>
+                    {% for count in below_count %}
+                        <td>{{ count }}</td>
+                    {% endfor %}
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div><br><br>
+{% endblock chart %}

@@ -1,0 +1,71 @@
+{% extends 'mysite/food_base.html' %}
+{% block chart %}
+    {{ echart1|safe }}<br>
+    <div class="row">
+        <div class="col-md-6">
+            {{ echart2|safe }}
+        </div>
+        <div class="col-md-6">
+            {{ echart3|safe }}
+        </div>
+    </div><br>
+    <div class="row">
+        <div class="col-md-5">
+            {{ echart4|safe }}
+        </div>
+        <div class="col-md-7">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">店铺名</th>
+                    <th scope="col">种类</th>
+                    <th scope="col">推荐菜1</th>
+                    <th scope="col">推荐菜2</th>
+                    <th scope="col">推荐菜3</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for high in highs %}
+                    <tr>
+                        <th scope="row">{{ high.name }}</th>
+                        <td>{{ high.type }}</td>
+                        <td>{{ high.recommend0 }}</td>
+                        <td>{{ high.recommend1 }}</td>
+                        <td>{{ high.recommend2 }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-5">
+            {{ echart5|safe }}
+        </div>
+        <div class="col-md-7">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">店铺名</th>
+                    <th scope="col">种类</th>
+                    <th scope="col">推荐菜1</th>
+                    <th scope="col">推荐菜2</th>
+                    <th scope="col">推荐菜3</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for low in lows %}
+                    <tr>
+                        <th scope="row">{{ low.name }}</th>
+                        <td>{{ low.type }}</td>
+                        <td>{{ low.recommend0 }}</td>
+                        <td>{{ low.recommend1 }}</td>
+                        <td>{{ low.recommend2 }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div><br>
+
+{% endblock chart %}

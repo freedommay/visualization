@@ -1,0 +1,29 @@
+{% extends 'mysite/food_base.html' %}
+{% block chart %}
+    {{ echart1|safe }}<br>
+    <div class="row">
+        <div class="col-md-6">
+            {{ echart2|safe }}
+        </div>
+        <div class="col-md-6">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">店铺名</th>
+                    <th scope="col">商圈</th>
+                    <th scope="col">地址</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for shop in popular_shop %}
+                    <tr>
+                        <th scope="row">{{ shop.name }}</th>
+                        <td>{{ shop.zone }}</td>
+                        <td>{{ shop.address }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock chart %}
