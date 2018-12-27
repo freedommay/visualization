@@ -13,25 +13,19 @@ def index(request):
 def food_page_first(request):
     food = pd.read_csv('../data/food.csv')
     type_info = food.groupby('type').name.count().sort_values(ascending=False)
-    type = [i for i in type_info.index]
-    type_count = [i for i in type_info.values]
     type_bar = Bar('各菜系商家数量', width='1000px', title_pos='center', title_top='bottom')
-    type_bar.add('数量', type, type_count, is_label_show=True, bar_category_gap='30%', xaxis_rotate=50)
+    type_bar.add('数量', type_info.index, type_info.values, is_label_show=True, bar_category_gap='30%', xaxis_rotate=50)
     zone_info = food.groupby('zone').name.count().sort_values(ascending=False).head(15)
-    zone = [i for i in zone_info.index]
-    zone_count = [i for i in zone_info.values]
     zone_bar = Bar('各商区商家数量', title_pos='center', title_top='bottom')
-    zone_bar.add('数量', zone, zone_count, is_label_show=True, xaxis_rotate=30)
+    zone_bar.add('数量', zone_info.index, zone_info.values, is_label_show=True, xaxis_rotate=30)
     star_list = ['二星商户', '三星商户', '准四星商户', '四星商户', '准五星商户', '五星商户']
     star_data = food[food.star.isin(['二星商户', '三星商户', '准四星商户', '四星商户', '准五星商户', '五星商户'])]
     star_data['star'] = star_data['star'].astype('category')
     star_data['star'].cat.set_categories(star_list, inplace=True)
     star_data.sort_values('star', inplace=True)
     star_info = star_data.groupby('star').name.count()
-    star = [i for i in star_info.index]
-    star_count = [i for i in star_info.values]
     star_pie = Pie('商家星级比例', title_pos='center', title_top='bottom')
-    star_pie.add('数量', star, star_count, is_label_show=True)
+    star_pie.add('数量', star_info.index, star_info.values, is_label_show=True)
     context = dict(
         echart1=type_bar.render_embed(),
         echart2=zone_bar.render_embed(),
@@ -51,41 +45,34 @@ def food_page_second(request):
     price_data = price_data[price_data.price < 2000]
     price_data.rename(columns={'recommend.0': 'recommend0', 'recommend.1': 'recommend1', 'recommend.2': 'recommend2'},
                       inplace=True)
-    price = [i for i in price_data.price]
     price_data_high = price_data.sort_values(by='price', ascending=False).head(5)
     highs = [row for index, row in price_data_high.iterrows()]
-    price_data_high_name = [i for i in price_data_high.name]
-    price_data_high_price = [i for i in price_data_high.price]
     price_data_high_bar = Bar("人均消费水平最高的五家店铺", width='600px', title_pos='center', title_top='bottom')
-    price_data_high_bar.add('', price_data_high_name, price_data_high_price, xaxis_rotate=10, bar_category_gap='30%',
+    price_data_high_bar.add('', price_data_high.name, price_data_high.price, xaxis_rotate=10, bar_category_gap='30%',
                             yaxis_name='元', yaxis_name_pos='end')
     price_data_low = price_data.sort_values(by='price').head(5)
     lows = [row for index, row in price_data_low.iterrows()]
-    price_data_low_name = [i for i in price_data_low.name]
-    price_data_low_price = [i for i in price_data_low.price]
     price_data_low_bar = Bar("人均消费水平最低的五家店铺", width='600px', title_pos='center', title_top='bottom')
-    price_data_low_bar.add('', price_data_low_name, price_data_low_price, xaxis_rotate=10, bar_category_gap='30%',
+    price_data_low_bar.add('', price_data_low.name, price_data_low.price, xaxis_rotate=10, bar_category_gap='30%',
                            yaxis_name='元', yaxis_name_pos='end')
     price_data_sub = price_data[price_data.price < 500]
     price_info = price_data_sub.groupby('price').name.count()
-    price_sub = [i for i in price_info.index]
-    price_count = [i for i in price_info.values]
     price_limit = [i for i in price_info.index]
     price_scatter = Scatter("人均消费(<=500元)", title_pos='center', title_top='bottom')
-    price_scatter.add('', price_sub, price_count, extra_data=price_limit, is_visualmap=True, xaxis_name='人均/元',
+    price_scatter.add('', price_info.index, price_info.values, extra_data=price_limit, is_visualmap=True,
+                      xaxis_name='人均/元',
                       xaxis_name_pos='end', yaxis_name='店铺数量/家', yaxis_name_pos='end', visual_range=[0, 500])
     boxplot = Boxplot('人均消费箱型图', width='400px', title_pos='center', title_top='bottom')
     x_axis = ['']
-    boxplot.add('', x_axis, boxplot.prepare_data([price]), yaxis_name='元', yaxis_name_pos='end')
+    boxplot.add('', x_axis, boxplot.prepare_data([price_data.price]), yaxis_name='元', yaxis_name_pos='end')
     price_range = list(range(0, 201, 20))
     price_range.append(13000)
     price_data['range'] = pd.cut(price_data.price, price_range, right=True)
     price_data_range = price_data.groupby('range').name.count()
     x_range = ['(0, 20]', '(20, 40]', '(40, 60]', '(60, 80]', '(80, 100]', '(100, 120]',
                '(120, 140]', '(140, 160]', '(160, 180]', '(180, 200]', '>200']
-    range_count = [i for i in price_data_range.values]
     line = Line("分区间人均消费水平", width='600px', title_pos='center', title_top='bottom')
-    line.add('', x_range, range_count, xaxis_rotate=30)
+    line.add('', x_range, price_data_range.values, xaxis_rotate=30)
     context = dict(
         echart1=price_scatter.render_embed(),
         echart2=boxplot.render_embed(),
@@ -95,8 +82,8 @@ def food_page_second(request):
         highs=highs,
         lows=lows,
         price_data_high=price_data_high,
-        price_data_high_name=price_data_high_name,
-        price_data_high_price=price_data_high_price,
+        price_data_high_name=price_data_high.name,
+        price_data_high_price=price_data_high.price,
         host=REMOTE_HOST,
         script_list=price_scatter.get_js_dependencies()
     )
@@ -108,16 +95,12 @@ def food_page_third(request):
     comment_data = food.dropna(subset=['comment'])
     comment_data_most = comment_data.sort_values(by='comment', ascending=False).head(5)
     popular_shop = [row for index, row in comment_data_most.iterrows()]
-    comment = [i for i in comment_data_most.comment]
-    name = [i for i in comment_data_most.name]
     comment_bar = Bar("'网红'店铺", width='600px', title_pos='center', title_top='bottom')
-    comment_bar.add('', name, comment, xaxis_rotate=15, is_label_show=True)
+    comment_bar.add('', comment_data_most.name, comment_data_most.comment, xaxis_rotate=15, is_label_show=True)
     comment_data['name'] = comment_data['name'].map(lambda x: x.split('(')[0])
     shop = comment_data.groupby('name').name.count().sort_values(ascending=False).head(15)
-    shop_name = [i for i in shop.index]
-    shop_count = [i for i in shop.values]
     shop_bar = Bar("分店最多的店铺", title_pos='center', title_top='bottom')
-    shop_bar.add('', shop_name, shop_count, xaxis_rotate=30, is_label_show=True)
+    shop_bar.add('', shop.index, shop.values, xaxis_rotate=30, is_label_show=True)
     context = dict(
         echart1=shop_bar.render_embed(),
         echart2=comment_bar.render_embed(),
@@ -133,10 +116,10 @@ def food_page_fourth(request):
     filter_data = food.groupby('type').filter(lambda x: x['name'].count() >= 100)
     score_data = filter_data.groupby('type')['name', 'taste', 'env', 'service'].mean()
     score_data.dropna(inplace=True)
-    score_data_name = [i for i in score_data.index]
-    score_data_taste = [i for i in score_data['taste']]
-    score_data_env = [i for i in score_data['env']]
-    score_data_service = [i for i in score_data['service']]
+    score_data_name = score_data.index
+    score_data_taste = score_data['taste']
+    score_data_env = score_data['env']
+    score_data_service = score_data['service']
     line = Line("各菜系口味、环境、服务平均得分", width='1200px', title_pos='center', title_top='bottom')
     line.add('口味', score_data_name, score_data_taste, xaxis_rotate=60)
     line.add('环境', score_data_name, score_data_env, xaxis_rotate=60)
@@ -178,9 +161,8 @@ def food_page_fifth(request):
     recommend_name = [i for i in recommend_data.index]
     for i, name in enumerate(recommend_name):
         recommend_name[i] = name.strip('不少于')
-    recommend_value = [i for i in recommend_data.values]
     worldcloud = WordCloud(width=1000, height=800)
-    worldcloud.add("", recommend_name, recommend_value, word_size_range=[10, 100], shape='star')
+    worldcloud.add("", recommend_data.index, recommend_data.values, word_size_range=[10, 100], shape='star')
     context = dict(
         echart=worldcloud.render_embed(),
         host=REMOTE_HOST,
@@ -192,10 +174,9 @@ def food_page_fifth(request):
 def spot_page_first(request):
     spot = pd.read_csv('../data/spot.csv')
     spot_sub_data = spot.head(200)
-    spot_title = [i for i in spot_sub_data.title]
     spot_value = [1] * 200
     worldcloud = WordCloud(width=1000, height=800)
-    worldcloud.add("", spot_title, spot_value, word_size_range=[10, 10])
+    worldcloud.add("", spot_sub_data.title, spot_value, word_size_range=[10, 10])
     context = dict(
         echart=worldcloud.render_embed(),
         host=REMOTE_HOST,
@@ -210,12 +191,9 @@ def house_page_first(request):
 
 def weather_page_first(request):
     weather = pd.read_csv('./data/weather.csv')
-    date = [i for i in weather.date]
-    max_temp = [i for i in weather['max']]
-    min_temp = [i for i in weather['min']]
     line = Line("历史天气温度(2011年1月1日至2018年10月31日)", width=1200, title_pos='center', title_top='bottom')
-    line.add("一天中最高温度", date, max_temp, is_datazoom_show=True)
-    line.add("一天中最低温度", date, min_temp, is_datazoom_show=True)
+    line.add("一天中最高温度", weather.date, weather['max'], is_datazoom_show=True)
+    line.add("一天中最低温度", weather.date, weather['min'], is_datazoom_show=True)
     max_max_all = weather.sort_values(by='max', ascending=False).head(3)
     max_max = [row for index, row in max_max_all.iterrows()]
     min_min_all = weather.sort_values(by='min').head(3)
@@ -243,10 +221,8 @@ def weather_page_second(request):
     weather_data = weather.groupby('weather').weather.count().sort_values(ascending=False)
     weather_data.loc['其他'] = weather_data[weather_data.values <= 15].count()
     weather_data = weather_data[weather_data.values > 15]
-    weather_category = [i for i in weather_data.index]
-    weather_count = [i for i in weather_data.values]
     weather_pie = Pie('各种天气所占比例', width='1200px', height='700px', title_pos='center', title_top='bottom')
-    weather_pie.add('数量', weather_category, weather_count, radius=[40, 75], label_text_color=None,
+    weather_pie.add('数量', weather_data.index, weather_data.values, radius=[40, 75], label_text_color=None,
                     is_label_show=True, legend_orient="vertical", legend_pos="left")
     weather_data_transform = weather.copy()
     for i, w in enumerate(weather_data_transform.weather):
@@ -255,10 +231,8 @@ def weather_page_second(request):
     weather_data_transform['date'] = weather_data_transform['date'].map(lambda x: x.split('-')[0])
     grouped = weather_data_transform.groupby(['date', 'weather']).weather.count()
     rain_data = grouped.unstack()['雨']
-    year = [i for i in rain_data.index]
-    rain_count = [i for i in rain_data.values]
     line = Line("每年下雨的天数", width=800, title_pos='center', title_top='bottom')
-    line.add('', year, rain_count, yaxis_name='天数', yaxis_name_pos='end')
+    line.add('', rain_data.index, rain_data.values, yaxis_name='天数', yaxis_name_pos='end')
     context = dict(
         echart1=weather_pie.render_embed(),
         echart2=line.render_embed(),
@@ -273,18 +247,14 @@ def weather_page_third(request):
     direction_data = weather.groupby('direction').direction.count().sort_values(ascending=False)
     direction_data.loc['其他'] = direction_data[direction_data.values <= 2].count()
     direction_data = direction_data[direction_data.values > 2]
-    direction = [i for i in direction_data.index]
-    direction_count = [i for i in direction_data.values]
     direction_pie = Pie('各种风向所占比例', width='1000px', height='600px', title_pos='center', title_top='bottom')
-    direction_pie.add('数量', direction, direction_count, label_text_color=None, is_label_show=True,
+    direction_pie.add('数量', direction_data.index, direction_data.values, label_text_color=None, is_label_show=True,
                       legend_orient="vertical", legend_pos="left")
     force_data = weather.groupby('power').direction.count().sort_values(ascending=False)
     force_data.loc['其他'] = force_data[force_data.values <= 2].count()
     force_data = force_data[force_data.values > 2]
-    force = [i for i in force_data.index]
-    force_count = [i for i in force_data.values]
     force_pie = Pie('各种风力所占比例', width='1000px', height='750px', title_pos='center', title_top='bottom')
-    force_pie.add('数量', force, force_count, label_text_color=None, is_label_show=True,
+    force_pie.add('数量', force_data.index, force_data.values, label_text_color=None, is_label_show=True,
                   legend_orient="vertical", legend_pos="left")
     context = dict(
         echart1=direction_pie.render_embed(),
