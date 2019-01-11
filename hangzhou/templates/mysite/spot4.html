@@ -1,0 +1,18 @@
+{% extends 'mysite/spot_base.html' %}
+{% block chart %}
+    <br><br><br><br>
+    <div class="row">
+        <div class="col-md-4">
+            {{ echart1|safe }}<br>
+            <h5 class="text-center" style="font-family: 微软雅黑"> 游玩时间大于3小时的景点</h5>
+        </div>
+        <div class="col-md-4">
+            {{ echart2|safe }}<br>
+            <h5 class="text-center" style="font-family: 微软雅黑"> 游玩时间小于1小时的景点</h5>
+        </div>
+        <div class="col-md-4">
+            {{ echart3|safe }}<br>
+            <h5 class="text-center" style="font-family: 微软雅黑"> 游玩时间1-3小时的景点</h5>
+        </div>
+    </div>
+{% endblock chart %}

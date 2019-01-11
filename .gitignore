@@ -1,2 +1,6 @@
 .ipynb_checkpoints/*
-hangzhou/.idea/*
+.idea/*
+input/*
+hangzhou/hangzhou/__pycache__/*
+hangzhou/mysite/__pycache__/*
+hangzhou/mysite/migrations/__pycache__/*
