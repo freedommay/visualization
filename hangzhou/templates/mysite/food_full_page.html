@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.0.5/fullpage.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/3.0.5/fullpage.min.js"></script>
+    {% for jsfile_name in script_list %}
+    <script src="{{ host }}/{{ jsfile_name }}.js"></script>
+    {% endfor %}
+    <style>
+        .section {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div id="fullpage">
+    <div class="section">
+        <h1>杭州市大众点评数据分析可视化</h1>
+    </div>
+    <div class="section">
+        <div class="slide">
+            {{ echart1|safe }}
+        </div>
+        <div class="slide">
+            {{ echart2|safe }}
+        </div>
+        <div class="slide">
+            {{ echart3|safe }}
+        </div>
+    </div>
+</div>
+<script>
+    new fullpage('#fullpage', {
+        autoScrolling: true,
+        scrollHorizontally: true,
+        slidesNavigation: true,
+        anchors: ['firstPage', 'secondPage']
+    })
+</script>
+</body>
+</html>

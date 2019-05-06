@@ -1,7 +1,7 @@
 import re
 
 from django.shortcuts import render
-from pyecharts import Bar, Pie, Line, Scatter, Boxplot, Radar, WordCloud
+from pyecharts import Bar, Pie, Line, Scatter, Boxplot, Radar, WordCloud, Geo, Style
 import numpy as np
 import pandas as pd
 
@@ -12,8 +12,35 @@ def index(request):
     return render(request, 'mysite/index.html')
 
 
+def food_full_page(request):
+    food = pd.read_csv('../data/food_dup.csv')  # 读取文件
+    type_info = food.groupby('type').name.count().sort_values(ascending=False)
+    type_bar = Bar('各菜系商家数量', width='1000px', title_pos='center', title_top='bottom')
+    type_bar.add('数量', type_info.index, type_info.values, is_label_show=True, bar_category_gap='30%', xaxis_rotate=50)
+    zone_info = food.groupby('zone').name.count().sort_values(ascending=False).head(15)
+    zone_bar = Bar('各商圈商家数量', title_pos='center', title_top='bottom')
+    zone_bar.add('数量', zone_info.index, zone_info.values, is_label_show=True, xaxis_rotate=30)
+    star_list = ['二星商户', '三星商户', '准四星商户', '四星商户', '准五星商户', '五星商户']
+    star_data = food[food.star.isin(['二星商户', '三星商户', '准四星商户', '四星商户', '准五星商户', '五星商户'])]
+    star_data['star'] = star_data['star'].astype('category')
+    star_data['star'].cat.set_categories(star_list, inplace=True)
+    star_data.sort_values('star', inplace=True)
+    star_info = star_data.groupby('star').name.count()
+    star_pie = Pie('商家星级比例', title_pos='center', title_top='bottom')
+    star_pie.add('数量', star_info.index, star_info.values, is_label_show=True)
+    context = dict(
+        echart1=type_bar.render_embed(),
+        echart2=zone_bar.render_embed(),
+        echart3=star_pie.render_embed(),
+        host=REMOTE_HOST,
+        script_list=type_bar.get_js_dependencies()
+    )
+    return render(request, 'mysite/food_full_page.html', context)
+
+
 def food_page_first(request):
     food = pd.read_csv('../data/food.csv')
+    """第一屏"""
     type_info = food.groupby('type').name.count().sort_values(ascending=False)
     type_bar = Bar('各菜系商家数量', width='1000px', title_pos='center', title_top='bottom')
     type_bar.add('数量', type_info.index, type_info.values, is_label_show=True, bar_category_gap='30%', xaxis_rotate=50)
@@ -171,6 +198,28 @@ def food_page_fifth(request):
         script_list=worldcloud.get_js_dependencies()
     )
     return render(request, 'mysite/food5.html', context)
+
+
+def food_page_six(request):
+    data = pd.read_csv('../data/food_dup.csv')
+    data.drop_duplicates(subset=['address'], inplace=True)
+    data = data.dropna(subset=['location', 'address'])
+    geo_cities_coords = {data.iloc[i]['address']: data.iloc[i]['location'].split(',')
+                         for i in range(data.shape[0])}
+    attr = list(data['address'])
+    value = list(np.ones(data.shape[0]))
+    style = Style(title_pos="center",
+                  width=1200, height=600)
+    geo = Geo('杭州店铺分布情况', **style.init_style)
+    geo.add("", attr, value, type='heatmap', is_visualmap=True, maptype='杭州',
+            geo_cities_coords=geo_cities_coords)
+
+    context = dict(
+        echart=geo.render_embed(),
+        host=REMOTE_HOST,
+        script_list=geo.get_js_dependencies()
+    )
+    return render(request, 'mysite/food6.html', context)
 
 
 def spot_page_first(request):
